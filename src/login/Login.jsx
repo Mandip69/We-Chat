@@ -6,6 +6,20 @@ import './Login.css';
 const Login = ({ setUser }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState('');
+
+  // Check password strength
+  const checkPasswordStrength = (password) => {
+    const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (password.length < 8) {
+      setPasswordStrength('Password must be at least 8 characters.');
+    } else if (!strongPasswordRegex.test(password)) {
+      setPasswordStrength('Password must include at least one letter, one number, and one special character.');
+    } else {
+      setPasswordStrength('Password is strong.');
+    }
+  };
 
   const handleEmailLogin = async () => {
     try {
@@ -35,6 +49,10 @@ const Login = ({ setUser }) => {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible((prev) => !prev);
+  };
+
   return (
     <div className="login-container">
       <div className="login-card">
@@ -50,12 +68,23 @@ const Login = ({ setUser }) => {
         </div>
         <div className="form-group">
           <input
-            type="password"
+            type={isPasswordVisible ? 'text' : 'password'}
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+            onChange={(e) => {
+              setPassword(e.target.value);
+              checkPasswordStrength(e.target.value);
+            }}
+            />
+          <i 
+            className={`fas ${isPasswordVisible ? 'fa-eye-slash' : 'fa-eye'}`} 
+            onClick={togglePasswordVisibility}
+            style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer' }}
+          /> 
         </div>
+        <p className={`password-strength ${passwordStrength === 'Password is strong.' ? 'strong' : ''}`}>
+          {passwordStrength}
+        </p>
         <button onClick={handleEmailLogin} className="btn primary-btn">
           <i className="fas fa-sign-in-alt"></i> Login
         </button>
